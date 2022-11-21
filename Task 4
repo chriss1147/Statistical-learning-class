@@ -1,0 +1,34 @@
+library(kernlab)
+library(MASS)
+data<-Boston
+
+sigma<-0.5
+lambda<-1
+
+predictKRR<- function(trainX, trainY, X, lambda, sigma)
+  set.seed(2020)
+  train<- sample(nrow(data),400)
+  trainX<- data[train,-14]
+  trainY<- data[train,14]
+  X<-data[-train,-14]
+  
+  unbiasedmatrix<-trainX-t(replicate(nrow(trainX),colMeans(trainX)))
+  stdvec<-0
+  for(i in 1:length(trainX[1,])){
+    stdvec<-sqrt(var(unbiasedmatrix[,i]))
+    unbiasedmatrix[,i]<-unbiasedmatrix[,i]*(1/stdvec)
+  }
+  unbiasedmatrix<-as.matrix(unbiasedmatrix)
+  K<-kernelMatrix(rbfdot(sigma), trainX)
+  a<-solve(K+lambda*diag(length(trainX[,1])))%*%trainY
+  
+  #This is where we left
+  X<-as.matrix(X); trainX<-as.matrix(trainX)
+  kernelfunction<-rbfdot(sigma)
+  vector<-0
+  #Needs to have the ones replaced by i for it to loop
+  for (i in 1:length(trainX[,1])){
+    
+    vector[1]<- kernelfunction(as.vector(trainX[1,]),as.vector(X[1,]))
+
+  }
